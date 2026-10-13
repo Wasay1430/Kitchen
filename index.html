@@ -97,6 +97,27 @@ dialog::backdrop{background:rgba(8,20,13,.55);backdrop-filter:blur(3px)}
 .ok .big{font-size:60px;line-height:1.4}
 .toast{position:fixed;inset-inline:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));margin:auto;max-width:420px;background:var(--ink);color:var(--bg);padding:6px 18px;border-radius:16px;text-align:center;font-size:14.5px;line-height:2;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;z-index:20}
 .toast.on{opacity:1;transform:none}
+.tb{position:sticky;top:0;z-index:6;padding:8px 14px;padding-top:calc(8px + env(safe-area-inset-top,0px));background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px)}
+.tbin{display:flex;gap:8px;max-width:880px;margin:0 auto;align-items:center}
+.tbin .search{flex:1}
+.fbtn{flex:none;min-height:48px;border:0;border-radius:999px;padding:2px 18px;background:linear-gradient(135deg,var(--acc2),var(--acc));color:var(--accink);font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(30,107,71,.3)}
+.fbtn b{background:#fff;color:#14543A;border-radius:999px;min-width:22px;height:22px;display:inline-grid;place-items:center;font-size:12.5px;line-height:1;padding:0 5px}
+.fbtn b[hidden]{display:none}
+.quick{display:flex;gap:8px;margin:2px 0 8px;flex-wrap:wrap}
+.chip.act{min-height:36px;font-size:13.5px;background:var(--card);border-color:var(--acc);color:var(--acc);font-weight:600}
+.heart{flex:none;background:none;border:0;font-size:22px;line-height:1;padding:10px 4px;cursor:pointer;align-self:flex-start;margin-top:4px}
+#dFil{margin:auto auto 0;border-radius:28px 28px 0 0;max-width:640px;width:100%;max-height:92dvh}
+#dFil[open]{animation:up .28s ease-out}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.pk.spin h3{opacity:.55;filter:blur(1.2px)}
+.wr{display:flex;align-items:center;gap:10px;padding:2px 0;border-bottom:1px solid var(--line)}
+.wr:last-child{border:0}
+.wd{width:58px;flex:none;font-weight:600;color:var(--acc);font-size:14.5px}
+.we{font-size:26px;line-height:1;flex:none}
+.wn{flex:1;min-width:0;line-height:1.9}
+.wn b{font-size:17px;display:block;font-weight:600;line-height:2}
+.wn small{color:var(--mut);font-size:12.5px}
+.rr{flex:none;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);background:var(--soft);font-size:17px;cursor:pointer}
 @media (max-width:420px){.tile .t{font-size:13px}.fab{padding:4px 16px;font-size:15px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -107,22 +128,33 @@ dialog::backdrop{background:rgba(8,20,13,.55);backdrop-filter:blur(3px)}
 <p>موسم اور گھر میں موجود اجزاء کے حساب سے ڈشیں، ایک ہی جگہ۔</p>
 <button class="hbtn" id="gbtn">📖 استعمال کا طریقہ</button>
 </div></header>
+<div class="tb"><div class="tbin">
+<div class="search"><span>🔎</span><input type="search" id="q" placeholder="ڈش یا جز کا نام تلاش کریں" aria-label="تلاش"></div>
+<button class="fbtn" id="fbtn"><span>🎛️</span>فلٹر<b id="fbad" hidden>0</b></button>
+</div></div>
 <main>
-<section class="sec"><h2>🗓️ موسم</h2><div class="seas" id="sea"></div></section>
-<section class="sec">
-<h2>🍽️ قسم</h2><div class="wrap" id="cat"></div>
-<h2 style="margin-top:12px">⏰ کھانے کا وقت</h2><div class="wrap" id="meal"></div>
-</section>
-<section class="sec">
-<h2>🧺 گھر میں موجود اجزاء <small id="icnt"></small><button class="mini" id="iclr" style="margin-inline-start:auto;display:none">صاف کریں</button></h2>
-<div id="ing"></div>
-</section>
-<section class="sec" style="padding-top:12px"><div class="search"><span>🔎</span><input type="search" id="q" placeholder="ڈش یا جز کا نام تلاش کریں" aria-label="تلاش"></div></section>
-<div class="bar"><b id="cnt"></b><span class="wrap" style="align-items:center"><button class="chip" id="all" aria-pressed="false">چنے ہوئے سب اجزاء لازمی</button><button class="mini" id="clr">فلٹر ہٹائیں</button></span></div>
+<div class="quick"><button class="chip" id="favf" aria-pressed="false"><span class="e">❤️</span><span class="t">پسندیدہ</span></button><button class="chip" id="wkb"><span class="e">📅</span><span class="t">ہفتے کا مینو</span></button></div>
+<div class="wrap" id="act" style="margin:0 0 8px"></div>
+<div class="bar"><b id="cnt"></b><button class="mini" id="clr">سب فلٹر ہٹائیں</button></div>
 <div class="grid" id="out"></div>
 </main>
 <div class="dock"><button class="fab s" id="rnd"><span>🎲</span>کوئی ایک بتائیں</button><button class="fab p" id="addb" style="display:none"><span>＋</span>نئی ڈش</button></div>
 <div class="toast" id="toast" role="status"></div>
+
+<dialog id="dFil"><div class="dh"><h2>🎛️ فلٹر</h2><button class="x" data-close aria-label="بند کریں">✕</button></div>
+<div class="db">
+<div class="fl">🗓️ موسم</div><div class="seas" id="sea"></div>
+<div class="fl">🍽️ قسم</div><div class="wrap" id="cat"></div>
+<div class="fl">⏰ کھانے کا وقت</div><div class="wrap" id="meal"></div>
+<div class="fl">🧺 گھر میں موجود اجزاء <small id="icnt"></small><button class="mini" id="iclr" style="margin-inline-start:auto;display:none">صاف کریں</button></div>
+<div id="ing"></div>
+<div style="margin-top:12px"><button class="chip" id="all" aria-pressed="false">چنے ہوئے سب اجزاء لازمی</button></div>
+</div>
+<div class="df" style="justify-content:space-between"><button class="btn g" id="fclr">فلٹر ہٹائیں</button><button class="btn" id="fapply" style="flex:1">ڈشیں دیکھیں</button></div></dialog>
+
+<dialog id="dWeek"><div class="dh"><h2>📅 ہفتے کا مینو</h2><button class="x" data-close aria-label="بند کریں">✕</button></div>
+<div class="db"><div class="sub" id="wnote"></div><div id="wl"></div></div>
+<div class="df" style="justify-content:space-between"><button class="btn g" id="wre">🔁 نیا مینو</button><button class="btn g" id="wshare">📤 شیئر</button><button class="btn" data-close>ٹھیک ہے</button></div></dialog>
 
 <dialog id="dAdd"><div class="dh"><h2>🍲 نئی ڈش شامل کریں</h2><button class="x" data-close aria-label="بند کریں">✕</button></div>
 <div id="aForm" style="display:contents"><div class="db">
@@ -153,7 +185,7 @@ const CE={'سبزی':'🥦','دال اور پھلیاں':'🍲','گوشت (بی�
 const IE={'آلو':'🥔','پالک':'🥬','میتھی':'🌿','مٹر':'🟢','پھول گوبھی':'🥦','بند گوبھی':'🥬','شلجم':'🟣','گاجر':'🥕','مولی':'🤍','سرسوں':'🌼','لوکی':'🥒','توری':'🥒','کدو':'🎃','کریلا':'🥒','بھنڈی':'🟩','ٹنڈا':'🟢','بیگن':'🍆','اروی':'🟤','گوار':'🫛','شملہ مرچ':'🫑','کلفہ':'🌿','ٹماٹر':'🍅','کھیرا':'🥒','مکس سبزی':'🥗','چکن':'🍗','گوشت':'🥩','قیمہ':'🍖','مچھلی':'🐟','انڈے':'🥚','پنیر':'🧀','مونگ دال':'🟡','مسور دال':'🟠','ماش دال':'⚪','ارہر دال':'🟨','چنے کی دال':'🟡','مکس دال':'🍲','چنا':'🫘','لوبیہ':'🫘','بیسن':'🟨','چاول':'🍚','آٹا':'🌾','میدہ':'🌾','سوجی':'🌾','نوڈلز':'🍜','دہی':'🥛','دودھ':'🥛'};
 const ce=c=>CE[c]||'🍽️',ie=i=>IE[i]||'🔸';
 const $=i=>document.getElementById(i);
-const st={sea:'',cat:'',meal:'',ing:new Set(),q:'',all:false};
+const st={sea:'',cat:'',meal:'',ing:new Set(),q:'',all:false,fav:false};
 const F={cat:'',sea:new Set(),meal:'کھانا',ing:new Set()};
 let R=[];
 const tog=(s,v)=>s.has(v)?s.delete(v):s.add(v);
@@ -164,7 +196,7 @@ function mk(el,items,on,click,cls){
     b.innerHTML=(e?'<span class="e"></span>':'')+'<span class="t"></span>';
     if(e)b.querySelector('.e').textContent=e;b.querySelector('.t').textContent=t;
     if(cls==='tile')b.dataset.s=v;
-    b.onclick=()=>{click(v);sync();if(el.closest('dialog')===null)draw()};
+    b.onclick=()=>{click(v);sync();if(el.closest('#dAdd')===null)draw()};
     R.push({b,on:()=>on(v)});el.appendChild(b);
   });
 }
@@ -184,12 +216,21 @@ function build(){
   });
   buildCats();
 }
+const CI={'گوشت (بیف / مٹن)':['گوشت','قیمہ'],'چکن':['چکن'],'مچھلی':['مچھلی'],'انڈے':['انڈے']};
+let FAV=new Set();try{FAV=new Set(JSON.parse(localStorage.getItem('kitchen_fav')||'[]'))}catch(e){}
+const saveFav=()=>{try{localStorage.setItem('kitchen_fav',JSON.stringify([...FAV]))}catch(e){}};
 function filt(){
   const q=st.q.trim();
-  return D.map((d,k)=>({d,k,m:d[2].filter(i=>st.ing.has(i)).length})).filter(({d,m})=>
-    (!st.sea||d[3].includes(st.sea))&&(!st.cat||d[1]===st.cat)&&(!st.meal||d[4]===st.meal)&&
-    (!q||d[0].includes(q)||d[2].some(i=>i.includes(q)))&&(!st.ing.size||(st.all?m===st.ing.size:m>0))
-  ).sort((a,b)=>b.m-a.m||a.k-b.k);
+  return D.map((d,k)=>{
+    const m=d[2].filter(i=>st.ing.has(i)).length;
+    return {d,k,m,s:(st.cat&&d[1]===st.cat?10000:0)+m*100+(st.sea&&d[3].length<3?10:0)};
+  }).filter(({d,m})=>
+    (!st.sea||d[3].includes(st.sea))&&
+    (!st.cat||d[1]===st.cat||(CI[st.cat]||[]).some(i=>d[2].includes(i)))&&
+    (!st.meal||d[4]===st.meal)&&(!st.fav||FAV.has(d[0]))&&
+    (!q||d[0].includes(q)||d[2].some(i=>i.includes(q)))&&
+    (!st.ing.size||(st.all?m===st.ing.size:m>0))
+  ).sort((a,b)=>b.s-a.s||a.k-b.k);
 }
 function tags(d,box){
   const add=(x,k)=>{const s=document.createElement('span');s.className='tag '+k;s.textContent=x;box.appendChild(s)};
@@ -197,19 +238,36 @@ function tags(d,box){
   d[2].forEach(i=>add(ie(i)+' '+i,st.ing.has(i)?'i':''));
   if(d[5])add('نئی ڈش','n');
 }
+function acts(){
+  const a=[];
+  if(st.sea)a.push([SE[st.sea]+' '+SN[st.sea],()=>st.sea='']);
+  if(st.cat)a.push([ce(st.cat)+' '+st.cat,()=>st.cat='']);
+  if(st.meal)a.push([ME[st.meal]+' '+ML[st.meal],()=>st.meal='']);
+  st.ing.forEach(i=>a.push([ie(i)+' '+i,()=>st.ing.delete(i)]));
+  return a;
+}
+function favLabel(){$('favf').setAttribute('aria-pressed',st.fav);$('favf').querySelector('.t').textContent='پسندیدہ'+(FAV.size?' ('+FAV.size+')':'')}
 function draw(){
   sync();
-  const r=filt(),out=$('out');
+  const r=filt(),out=$('out'),a=acts();
   $('cnt').textContent=r.length+' ڈشیں';
+  $('fapply').textContent=r.length?r.length+' ڈشیں دیکھیں':'کوئی ڈش نہیں ملی';
+  const fb=$('fbad');fb.textContent=a.length;fb.hidden=!a.length;
   $('icnt').textContent=st.ing.size?'(چنے ہوئے: '+st.ing.size+')':'';
   $('iclr').style.display=st.ing.size?'':'none';
+  favLabel();
+  const ac=$('act');ac.innerHTML='';
+  a.forEach(([x,f])=>{const b=document.createElement('button');b.className='chip act';b.textContent=x+'  ✕';b.onclick=()=>{f();draw()};ac.appendChild(b)});
   out.innerHTML='';
-  if(!r.length){out.innerHTML='<div class="empty">😕<br>کوئی ڈش نہیں ملی۔ کوئی فلٹر ہٹا کر دوبارہ دیکھیں۔</div>';return}
+  if(!r.length){out.innerHTML='<div class="empty">'+(st.fav&&!FAV.size?'❤️<br>ابھی کوئی پسندیدہ ڈش نہیں۔ کسی ڈش کے ❤ کو دبائیں۔':'😕<br>کوئی ڈش نہیں ملی۔ کوئی فلٹر ہٹا کر دوبارہ دیکھیں۔')+'</div>';return}
   r.forEach(({d})=>{
     const c=document.createElement('div');c.className='card';
-    c.innerHTML='<div class="ico"></div><div><h3></h3><div class="tags"></div></div>';
+    c.innerHTML='<div class="ico"></div><div style="flex:1;min-width:0"><h3></h3><div class="tags"></div></div><button class="heart" type="button"></button>';
     c.querySelector('.ico').textContent=ce(d[1]);c.querySelector('h3').textContent=d[0];
     tags(d,c.querySelector('.tags'));
+    const h=c.querySelector('.heart'),on=()=>FAV.has(d[0]);
+    const up=()=>{h.textContent=on()?'❤️':'🤍';h.setAttribute('aria-pressed',on());h.setAttribute('aria-label','پسندیدہ میں شامل کریں')};
+    up();h.onclick=()=>{on()?FAV.delete(d[0]):FAV.add(d[0]);saveFav();if(st.fav)draw();else{up();favLabel()}};
     out.appendChild(c);
   });
 }
@@ -218,19 +276,66 @@ document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{i
 $('q').oninput=e=>{st.q=e.target.value;draw()};
 $('all').onclick=()=>{st.all=!st.all;$('all').setAttribute('aria-pressed',st.all);draw()};
 $('iclr').onclick=()=>{st.ing.clear();draw()};
-$('clr').onclick=()=>{st.sea=st.cat=st.meal=st.q='';st.ing.clear();st.all=false;$('all').setAttribute('aria-pressed',false);$('q').value='';draw()};
-let last=null;
-function pick(){
-  const r=filt(),pk=$('pk');
-  if(!r.length){pk.innerHTML='<div class="big">😕</div><p style="color:var(--mut)">موجودہ فلٹر میں کوئی ڈش نہیں۔ فلٹر کم کر کے دیکھیں۔</p>';$('again').style.display='none';return}
-  $('again').style.display='';
-  let d;do{d=r[Math.floor(Math.random()*r.length)].d}while(r.length>1&&d===last);last=d;
+function clearAll(){st.sea=st.cat=st.meal=st.q='';st.ing.clear();st.all=false;st.fav=false;$('all').setAttribute('aria-pressed',false);$('q').value='';draw()}
+$('clr').onclick=clearAll;$('fclr').onclick=clearAll;
+$('fbtn').onclick=()=>$('dFil').showModal();$('fapply').onclick=()=>$('dFil').close();
+$('favf').onclick=()=>{st.fav=!st.fav;draw()};
+let last=null,spinT;
+function showDish(d){
+  const pk=$('pk');
   pk.innerHTML='<div class="big"></div><h3></h3><div class="sub"></div><div class="tags"></div>';
   pk.querySelector('.big').textContent=ce(d[1]);pk.querySelector('h3').textContent=d[0];pk.querySelector('.sub').textContent=d[1];
   tags(d,pk.querySelector('.tags'));
 }
+function pick(){
+  clearInterval(spinT);
+  const r=filt(),pk=$('pk'),ag=$('again');
+  if(!r.length){pk.innerHTML='<div class="big">😕</div><p style="color:var(--mut)">موجودہ فلٹر میں کوئی ڈش نہیں۔ فلٹر کم کر کے دیکھیں۔</p>';ag.style.display='none';return}
+  ag.style.display='';
+  let d;do{d=r[Math.floor(Math.random()*r.length)].d}while(r.length>1&&d===last);last=d;
+  if(r.length<2||matchMedia('(prefers-reduced-motion:reduce)').matches){showDish(d);return}
+  ag.disabled=true;let n=0;pk.classList.add('spin');
+  spinT=setInterval(()=>{
+    if(++n>16){clearInterval(spinT);pk.classList.remove('spin');showDish(d);ag.disabled=false;return}
+    showDish(r[Math.floor(Math.random()*r.length)].d);
+  },80);
+}
+$('dPick').addEventListener('close',()=>{clearInterval(spinT);$('again').disabled=false;$('pk').classList.remove('spin')});
 $('rnd').onclick=()=>{pick();$('dPick').showModal()};$('again').onclick=pick;
-const GS=[['🍲','خوش آمدید!','یہ آپ کے باورچی خانے کا ساتھی ہے۔ موسم اور گھر میں موجود اجزاء بتائیں، یہ بتا دے گا کہ آج کیا پکانا ہے۔'],['🗓️','موسم اور قسم چنیں','اوپر گرمی، سردی یا برسات پر ٹیپ کریں۔ چاہیں تو قسم بھی چنیں، جیسے سبزی، دال، چکن یا میٹھا۔ دوبارہ ٹیپ کرنے سے چناؤ بدل جاتا ہے۔'],['🥔','گھر کے اجزاء چنیں','جو چیزیں گھر میں ہیں ان پر ٹیپ کریں۔ ان اجزاء والی ڈشیں سب سے اوپر آ جائیں گی۔ "چنے ہوئے سب اجزاء لازمی" لگائیں تو صرف وہی ڈشیں آئیں گی جن میں چنے ہوئے سارے اجزاء ہوں۔'],['🎲','فیصلہ نہ ہو تو؟','نیچے "کوئی ایک بتائیں" دبائیں۔ موجودہ فلٹر میں سے ایک ڈش تجویز ہو جائے گی۔ پسند نہ آئے تو "دوسری دکھائیں" دبائیں۔'],['➕','اپنی ڈش شامل کریں','نیچے "نئی ڈش" دبا کر نام، قسم، موسم اور اجزاء بھریں۔ ڈش سب گھر والوں کی فہرست میں آ جائے گی۔'],['📱','فون میں شارٹ کٹ','آئی فون: Safari میں شیئر کا بٹن، پھر Add to Home Screen۔ اینڈرائیڈ: Chrome کے مینو (تین نقطے) میں Add to Home screen۔ پھر یہ ایک ایپ کی طرح کھلے گا۔']];
+const DAYS=['اتوار','پیر','منگل','بدھ','جمعرات','جمعہ','ہفتہ'],NOMAIN=['میٹھا','رائتہ / سلاد','روٹی / نان','اسنیکس / کباب / سوپ'];
+let W=[];
+const dayName=i=>i===0?'آج':i===1?'کل':DAYS[(new Date().getDay()+i)%7];
+function wpool(){let p=filt().map(x=>x.d);if(!st.cat)p=p.filter(d=>d[4]==='کھانا'&&!NOMAIN.includes(d[1])&&!['سادہ چاول','زیرہ چاول','دہی چاول'].includes(d[0]));return p}
+function nextDish(p,i,skip){
+  const taken=new Set(W.filter((x,k)=>x&&k!==i).map(x=>x[0]));
+  const near=[W[i-1],W[i+1]].filter(Boolean).map(x=>x[1]);
+  let c=p.filter(d=>!taken.has(d[0])&&d!==skip);
+  const c2=c.filter(d=>!near.includes(d[1]));
+  c=c2.length?c2:c;
+  return c.length?c[Math.floor(Math.random()*c.length)]:(p[Math.floor(Math.random()*p.length)]||null);
+}
+function genWeek(){const p=wpool();W=new Array(7).fill(null);for(let i=0;i<7;i++)W[i]=nextDish(p,i);drawWeek()}
+function drawWeek(){
+  const a=acts();
+  $('wnote').textContent=a.length?'موجودہ فلٹر کے مطابق: '+a.map(x=>x[0]).join('، '):'کوئی فلٹر نہیں لگا، اس لیے سب ڈشوں میں سے بنایا ہے۔ سردی وغیرہ چن کر بنائیں تو اسی موسم کی ڈشیں آئیں گی۔';
+  const box=$('wl');box.innerHTML='';
+  W.forEach((d,i)=>{
+    const r=document.createElement('div');r.className='wr';
+    r.innerHTML='<div class="wd"></div><div class="we"></div><div class="wn"><b></b><small></small></div><button class="rr" type="button" aria-label="یہ ڈش بدلیں">🔁</button>';
+    r.querySelector('.wd').textContent=dayName(i);
+    r.querySelector('.we').textContent=d?ce(d[1]):'😕';
+    r.querySelector('b').textContent=d?d[0]:'کوئی ڈش نہیں ملی';
+    r.querySelector('small').textContent=d?d[1]:'';
+    r.querySelector('.rr').onclick=()=>{const n=nextDish(wpool(),i,W[i]);if(n){W[i]=n;drawWeek()}};
+    box.appendChild(r);
+  });
+}
+$('wkb').onclick=()=>{genWeek();$('dWeek').showModal()};$('wre').onclick=genWeek;
+$('wshare').onclick=async()=>{
+  const x='🍲 ہفتے کا مینو\n'+W.map((d,i)=>dayName(i)+': '+(d?d[0]:'-')).join('\n');
+  try{if(navigator.share)await navigator.share({text:x});else{await navigator.clipboard.writeText(x);toast('مینو کاپی ہو گیا')}}catch(e){}
+};
+const GS=[['🍲','خوش آمدید!','یہ آپ کے باورچی خانے کا ساتھی ہے۔ موسم اور گھر میں موجود اجزاء بتائیں، یہ بتا دے گا کہ آج کیا پکانا ہے۔'],['🎛️','فلٹر لگائیں','اوپر "فلٹر" دبائیں اور موسم، قسم، کھانے کا وقت چنیں۔ نیچے "ڈشیں دیکھیں" دبائیں تو نتیجے سامنے آ جائیں گے۔ چنے ہوئے فلٹر ڈشوں کے اوپر نشان کی شکل میں رہتے ہیں، ✕ سے ہٹا سکتے ہیں۔'],['🥔','گھر کے اجزاء چنیں','فلٹر میں جو چیزیں گھر میں ہیں ان پر ٹیپ کریں۔ صرف انہی اجزاء والی ڈشیں آئیں گی، اور جس میں زیادہ اجزاء ملتے ہوں وہ پہلے۔ "سب اجزاء لازمی" لگائیں تو صرف وہ ڈشیں آئیں گی جن میں چنے ہوئے سارے اجزاء ہوں۔'],['🎲','فیصلہ نہ ہو تو؟','نیچے "کوئی ایک بتائیں" دبائیں۔ موجودہ فلٹر میں سے ایک ڈش چُنی جائے گی۔ پسند نہ آئے تو "دوسری دکھائیں" دبائیں۔'],['📅','ہفتے کا مینو','"ہفتے کا مینو" دبائیں تو سات دن کی ڈشیں بن جائیں گی، جن میں قسمیں بدلتی رہتی ہیں۔ کوئی ڈش پسند نہ ہو تو 🔁 سے صرف وہی بدل لیں، اور 📤 سے گھر والوں کو بھیج دیں۔'],['❤️','پسندیدہ ڈشیں','ہر ڈش پر دل دبا کر اسے پسندیدہ بنائیں۔ اوپر "پسندیدہ" دبا کر صرف اپنی پسند کی ڈشیں دیکھیں۔ پسندیدہ فہرست ہر فون کی اپنی ہوتی ہے۔'],['➕','اپنی ڈش شامل کریں','نیچے "نئی ڈش" دبا کر نام، قسم، موسم اور اجزاء بھریں۔ ڈش سب گھر والوں کی فہرست میں آ جائے گی۔'],['📱','فون میں شارٹ کٹ','آئی فون: Safari میں شیئر کا بٹن، پھر Add to Home Screen۔ اینڈرائیڈ: Chrome کے مینو (تین نقطے) میں Add to Home screen۔ پھر یہ ایک ایپ کی طرح کھلے گا۔']];
 let gi=0;
 function gsr(){
   const [e,t,p]=GS[gi],s=$('gs');
